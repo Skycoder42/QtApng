@@ -1,2 +1,5 @@
 TEMPLATE = subdirs
-QT_FOR_CONFIG += core
+QT_FOR_CONFIG += gui
+
+SUBDIRS += \
+    sample
