@@ -4,6 +4,7 @@ set -e
 
 pngver=${1:?You need to specify a libpng version, e.g. 1.6.31}
 
+cd $(dirname $0)
 prefixdir=$(pwd)/libpng
 
 pushd $(mktemp -d)
@@ -27,4 +28,4 @@ make install
 
 popd
 
-echo "CONFIG += libpng_static" >> .qmake.conf
+echo "CONFIG += libpng_static" >> "$(pwd)/../../.qmake.conf"
