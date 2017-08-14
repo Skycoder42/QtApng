@@ -35,9 +35,15 @@ QVariant ApngImageHandler::option(QImageIOHandler::ImageOption option) const
 {
 	switch(option) {
 	case QImageIOHandler::Size:
-		return _reader->size();
+		if(_reader->init(device()))
+			return _reader->size();
+		else
+			return QSize();
 	case QImageIOHandler::Animation:
-		return _reader->isAnimated();
+		if(_reader->init(device()))
+			return _reader->isAnimated();
+		else
+			return true;
 	default:
 		return QVariant();
 	}
@@ -69,7 +75,8 @@ bool ApngImageHandler::jumpToImage(int imageNumber)
 {
 	if(!_reader->init(device()))
 		return false;
-	else if((quint32)imageNumber < _reader->frames()) {
+	else if((quint32)imageNumber < _reader->frames() &&
+			imageNumber >= 0) {
 		_index = imageNumber;
 		return true;
 	} else
@@ -108,5 +115,5 @@ int ApngImageHandler::nextImageDelay() const
 
 int ApngImageHandler::currentImageNumber() const
 {
-	return _index < _reader->frames() ? _index : 0;
+	return _index < _reader->frames() ? _index : -1;
 }

@@ -13,7 +13,7 @@ ApngReader::ApngReader(QObject *parent) :
 	_png(nullptr),
 	_info(nullptr),
 	_infoRead(false),
-	_animated(true),
+	_animated(false),
 	_skipFirst(false),
 	_imageSize(),
 	_frameCount(1),
@@ -29,6 +29,11 @@ ApngReader::~ApngReader()
 		_readers.remove(_png);
 		png_destroy_read_struct(&_png, &_info, NULL);
 	}
+
+	if (_frame.rows)
+		delete[] _frame.rows;
+	if (_frame.p)
+		delete[] _frame.p;
 }
 
 bool ApngReader::checkPngSig(QIODevice *device)
@@ -52,33 +57,35 @@ bool ApngReader::init(QIODevice *device)
 	else
 		return false;
 
-	try {
-		//init png structs
-		_png = png_create_read_struct(PNG_LIBPNG_VER_STRING, NULL, NULL, NULL);
-		if(!_png)
-			throw QStringLiteral("failed to create png struct");
-		_info = png_create_info_struct(_png);
-		if(!_info)
-			throw QStringLiteral("failed to create info struct");
+	//init png structs
+	_png = png_create_read_struct(PNG_LIBPNG_VER_STRING, NULL, NULL, NULL);
+	if(!_png) {
+		qCritical() << "failed to create png struct";
+		return false;
+	}
 
-		if (setjmp(png_jmpbuf(_png)))
-			throw QStringLiteral("failed to read image header");
+	_info = png_create_info_struct(_png);
+	if(!_info) {
+		qCritical() << "failed to create info struct";
+		return false;
+	}
 
-		_readers.insert(_png, this);
-		png_set_progressive_read_fn(_png, NULL, &ApngReader::info_fn, &ApngReader::row_fn, &ApngReader::end_fn);
+	_readers.insert(_png, this);
+	png_set_progressive_read_fn(_png, NULL, &ApngReader::info_fn, &ApngReader::row_fn, &ApngReader::end_fn);
 
-		//read image sig + header
-		auto valid = readChunk(8);
-		do {
-			valid = readChunk();
-		} while(valid && !_infoRead);
-
-		return _infoRead;
-	} catch(QString e) {
-		qCritical() << e;
+	//set png jump position
+	if (setjmp(png_jmpbuf(_png))) {
 		_infoRead = false;
 		return false;
 	}
+
+	//read image sig + header
+	auto valid = readChunk(8);
+	do {
+		valid = readChunk();
+	} while(valid && !_infoRead);
+
+	return _infoRead;
 }
 
 ApngReader::ApngFrame ApngReader::readFrame(quint32 index)
@@ -165,7 +172,8 @@ void ApngReader::info_fn(png_structp png_ptr, png_infop info_ptr)
 		//read info for first frame (skipped otherwise)
 		if(!reader->_skipFirst)
 			frame_info_fn(png_ptr, 0);
-	}
+	} else
+		reader->_animated = false;
 
 	reader->_infoRead = true;
 }
@@ -188,9 +196,13 @@ void ApngReader::end_fn(png_structp png_ptr, png_infop info_ptr)
 		reader->_allFrames.append(reader->_lastImg);
 	}
 
-	if (frame.p && frame.rows) {
+	if (frame.rows) {
 		delete[] frame.rows;
+		frame.rows = nullptr;
+	}
+	if (frame.p) {
 		delete[] frame.p;
+		frame.p = nullptr;
 	}
 }
 
@@ -236,7 +248,7 @@ void ApngReader::frame_end_fn(png_structp png_ptr, png_uint_32 frame_num)
 	else
 		reader->copyOver();
 
-	reader->_allFrames.append({image, (double)frame.delay_num / (double)frame.delay_den});
+	reader->_allFrames.append({image, frame.delay_num, frame.delay_den});
 
 	if (frame.dop == PNG_DISPOSE_OP_PREVIOUS)
 		image = temp;
@@ -254,9 +266,12 @@ bool ApngReader::readChunk(quint32 len)
 	if(len == 0) {// read exactly 1 chunk
 		//read 4 bytes -> size
 		data = _device->read(4);
-		len = *((quint32*)data.constData());
-		len = qFromBigEndian(len) + 8;//type (4b) + crc (4b)
-		data += _device->read(len);
+		if(data.size() == 4) {
+			len = *((quint32*)data.constData());
+			len = qFromBigEndian(len) + 8;//type (4b) + crc (4b)
+			data += _device->read(len);
+		}
+		//is save for invalid data, as at least 4 byte are always read
 	} else
 		data = _device->read(len);
 	if(!data.isEmpty())
@@ -317,9 +332,9 @@ void ApngReader::blendOver()
 
 
 
-ApngReader::ApngFrame::ApngFrame(const QImage &image, double delay) :
+ApngReader::ApngFrame::ApngFrame(const QImage &image, quint16 delay_num, quint16 delay_den) :
 	QImage(image),
-	_delay(delay)
+	_delay((double)delay_num / (double)delay_den)
 {}
 
 double ApngReader::ApngFrame::delay() const
@@ -331,3 +346,20 @@ int ApngReader::ApngFrame::delayMsec() const
 {
 	return qRound(_delay * 1000);
 }
+
+
+
+ApngReader::Frame::Frame() :
+	x(0),
+	y(0),
+	width(0),
+	height(0),
+	channels(0),
+	delay_num(0),
+	delay_den(1),
+	dop(PNG_DISPOSE_OP_NONE),
+	bop(PNG_BLEND_OP_SOURCE),
+	rowbytes(0),
+	p(nullptr),
+	rows(nullptr)
+{}
