@@ -20,7 +20,7 @@ class ApngReader : public QObject
 public:
 	class ApngFrame : public QImage {
 	public:
-		ApngFrame(const QImage &image = {}, quint16 delay_num = 1, quint16 delay_den = 10);
+		ApngFrame(const QImage &image = {}, quint16 delay_num = 0, quint16 delay_den = 10);
 
 		double delay() const;
 		int delayMsec() const;

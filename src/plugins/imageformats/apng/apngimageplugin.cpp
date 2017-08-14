@@ -9,7 +9,7 @@ ApngImagePlugin::ApngImagePlugin(QObject *parent) :
 QImageIOPlugin::Capabilities ApngImagePlugin::capabilities(QIODevice *device, const QByteArray &format) const
 {
 	if (format == "apng") {
-		if(device)
+		if(device && device->bytesAvailable() >= 8)
 			return ApngReader::checkPngSig(device) ? CanRead : (Capability)0;
 		else
 			return CanRead;
