@@ -16,18 +16,18 @@ CONFIG += link_pkgconfig
 	unix:PKGCONFIG += libpng
 	else:LIBS += -lpng
 } else {
-	win32:CONFIG(release, debug|release): LIBS += -L$$PWD/libpng/lib/ -lpng
-	else:win32:CONFIG(debug, debug|release): LIBS += -L$$PWD/libpng/lib/ -lpngd
-	else:unix: LIBS += -L$$PWD/libpng/lib/ -lpng
+	win32:CONFIG(release, debug|release): LIBS += -L$$PWD/../../../3rdparty/libpng/lib/ -lpng
+	else:win32:CONFIG(debug, debug|release): LIBS += -L$$PWD/../../../3rdparty/libpng/lib/ -lpngd
+	else:unix: LIBS += -L$$PWD/../../../3rdparty/libpng/lib/ -lpng
 
-	INCLUDEPATH += $$PWD/libpng/include
-	DEPENDPATH += $$PWD/libpng/include
+	INCLUDEPATH += $$PWD/../../../3rdparty/libpng/include
+	DEPENDPATH += $$PWD/../../../3rdparty/libpng/include
 
-	win32-g++:CONFIG(release, debug|release): PRE_TARGETDEPS += $$PWD/libpng/lib/libpng.a
-	else:win32-g++:CONFIG(debug, debug|release): PRE_TARGETDEPS += $$PWD/libpng/lib/libpngd.a
-	else:win32:!win32-g++:CONFIG(release, debug|release): PRE_TARGETDEPS += $$PWD/libpng/lib/png.lib
-	else:win32:!win32-g++:CONFIG(debug, debug|release): PRE_TARGETDEPS += $$PWD/libpng/lib/pngd.lib
-	else:unix: PRE_TARGETDEPS += $$PWD/libpng/lib/libpng.a
+	win32-g++:CONFIG(release, debug|release): PRE_TARGETDEPS += $$PWD/../../../3rdparty/libpng/lib/libpng.a
+	else:win32-g++:CONFIG(debug, debug|release): PRE_TARGETDEPS += $$PWD/../../../3rdparty/libpng/lib/libpngd.a
+	else:win32:!win32-g++:CONFIG(release, debug|release): PRE_TARGETDEPS += $$PWD/../../../3rdparty/libpng/lib/png.lib
+	else:win32:!win32-g++:CONFIG(debug, debug|release): PRE_TARGETDEPS += $$PWD/../../../3rdparty/libpng/lib/pngd.lib
+	else:unix: PRE_TARGETDEPS += $$PWD/../../../3rdparty/libpng/lib/libpng.a
 }
 
 PLUGIN_TYPE = imageformats
