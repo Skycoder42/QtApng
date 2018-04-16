@@ -9,25 +9,27 @@ SOURCES += apngimageplugin.cpp \
 	apngreader.cpp
 
 OTHER_FILES += qapng.json \
-	build_libpng_static.sh
+	../../../3rdparty/build_libpng_static.sh
 
-CONFIG += link_pkgconfig
 !libpng_static {
+	CONFIG += link_pkgconfig
 	unix:PKGCONFIG += libpng
 	else:LIBS += -lpng
 } else {
-	win32:CONFIG(release, debug|release): LIBS += -L$$PWD/../../../3rdparty/libpng/lib/ -lpng
-	else:win32:CONFIG(debug, debug|release): LIBS += -L$$PWD/../../../3rdparty/libpng/lib/ -lpngd
-	else:unix: LIBS += -L$$PWD/../../../3rdparty/libpng/lib/ -lpng
+	# link against libpng and zlib
+	win32:CONFIG(release, debug|release): LIBS_PRIVATE += -L$$OUT_PWD/../../../../lib/ -lpng -lz
+	else:win32:CONFIG(debug, debug|release): LIBS_PRIVATE += -L$$OUT_PWD/../../../../lib/ -lpngd -lzd
+	else:unix: LIBS_PRIVATE += -L$$OUT_PWD/../../../../lib/ -lpng -lz
 
-	INCLUDEPATH += $$PWD/../../../3rdparty/libpng/include
-	DEPENDPATH += $$PWD/../../../3rdparty/libpng/include
+	INCLUDEPATH += $$PWD/../../../..
+	DEPENDPATH += $$PWD/../../../..
 
-	win32-g++:CONFIG(release, debug|release): PRE_TARGETDEPS += $$PWD/../../../3rdparty/libpng/lib/libpng.a
-	else:win32-g++:CONFIG(debug, debug|release): PRE_TARGETDEPS += $$PWD/../../../3rdparty/libpng/lib/libpngd.a
-	else:win32:!win32-g++:CONFIG(release, debug|release): PRE_TARGETDEPS += $$PWD/../../../3rdparty/libpng/lib/png.lib
-	else:win32:!win32-g++:CONFIG(debug, debug|release): PRE_TARGETDEPS += $$PWD/../../../3rdparty/libpng/lib/pngd.lib
-	else:unix: PRE_TARGETDEPS += $$PWD/../../../3rdparty/libpng/lib/libpng.a
+	win32-g++:CONFIG(release, debug|release): PRE_TARGETDEPS += $$OUT_PWD/../../../../lib/libpng.a
+	else:win32-g++:CONFIG(debug, debug|release): PRE_TARGETDEPS += $$OUT_PWD/../../../../lib/libpngd.a
+	else:win32:!win32-g++:CONFIG(release, debug|release): PRE_TARGETDEPS += $$OUT_PWD/../../../../lib/png.lib
+	else:win32:!win32-g++:CONFIG(debug, debug|release): PRE_TARGETDEPS += $$OUT_PWD/../../../../lib/pngd.lib
+	else:unix: PRE_TARGETDEPS += $$OUT_PWD/../../../../lib/libpng.a
+
 }
 
 PLUGIN_TYPE = imageformats
