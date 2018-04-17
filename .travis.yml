@@ -5,15 +5,16 @@ services:
 
 sudo: required
 dist: trusty
-osx_image: xcode8.3
+osx_image: xcode9.2
 
 env:
   global:
-    - QT_VER=5.9.1
+    - QT_VER=5.10.1
     - ZLIB_VERSION=1.2.11
     - ZLIB_CHECKSUM=4ff941449631ace0d4d203e3483be9dbc9da454084111f97ea0a2114e19bf066
     - LIBPNG_VERSION=1.6.34
     - LIBPNG_CHECKSUM=c05b6ca7190a5e387b78657dbe5536b2
+    - DOCKER_IMAGE=base
 
 matrix:
   include:
@@ -21,15 +22,26 @@ matrix:
       env:
         - PLATFORM=gcc_64
         - BUILD_DOC=true
+        - BUILD_EXAMPLES=true
+    - os: linux
+      env:
+        - PLATFORM=android_armv7
+    - os: linux
+      env:
+        - PLATFORM=android_x86
     - os: osx
       env:
         - PLATFORM=clang_64
+    - os: osx
+      env:
+        - PLATFORM=ios
 
-before_install:
+install:
   - git clone https://github.com/Skycoder42/QtModules.git ./qtmodules-travis
   - if [ "$TRAVIS_OS_NAME" == "osx" ]; then travis_wait 40 ./qtmodules-travis/ci/$TRAVIS_OS_NAME/setup.sh; else ./qtmodules-travis/ci/$TRAVIS_OS_NAME/setup.sh; fi
 
 script:
+  - ./src/3rdparty/travis.sh
   - ./qtmodules-travis/ci/$TRAVIS_OS_NAME/build.sh
 
 before_deploy:
@@ -48,8 +60,10 @@ deploy:
 before_cache:
   - rm -f  $HOME/.gradle/caches/modules-2/modules-2.lock
   - rm -fr $HOME/.gradle/caches/*/plugin-resolution/
+  - rm -fr $QPMX_CACHE_DIR/locks
 cache:
   directories:
     - $HOME/.gradle/caches/
     - $HOME/.gradle/wrapper/
     - $HOME/.android/build-cache
+    - $QPMX_CACHE_DIR

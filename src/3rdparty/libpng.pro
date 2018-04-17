@@ -15,6 +15,7 @@ load(qt_helper_lib)
 
 HEADERS += $$files(*.h)
 SOURCES += $$files(*.c)
+SOURCES -= example.c
 
 win32:CONFIG(release, debug|release): LIBS += -L$$OUT_PWD/../../../lib/ -lz
 else:win32:CONFIG(debug, debug|release): LIBS += -L$$OUT_PWD/../../../lib/ -lzd

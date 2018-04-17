@@ -2,6 +2,9 @@
 # $1 libpng version
 set -e
 
+# update qmake conf
+echo "CONFIG += libpng_static" >> .qmake.conf
+
 cd $(dirname $0)
 
 # get zlib
@@ -23,6 +26,7 @@ curl -Lo libpng-apng.patch.gz "https://downloads.sourceforge.net/sourceforge/lib
 gunzip libpng-apng.patch.gz
 pushd libpng
 patch -Np1 -i "../libpng-apng.patch"
+ln -s scripts/pnglibconf.h.prebuilt pnglibconf.h
 popd
 
 # link pro files
