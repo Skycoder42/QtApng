@@ -1,6 +1,11 @@
 #!/bin/bash
 set -e
 
+if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then
+	alias sha256sum=gsha256sum
+	alias md5sum=gmd5sum
+fi
+
 # update qmake conf
 echo "CONFIG += libpng_static" >> .qmake.conf
 
