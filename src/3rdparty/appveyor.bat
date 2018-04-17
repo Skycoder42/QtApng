@@ -7,8 +7,9 @@ echo CONFIG += libpng_static >> .qmake.conf
 cd "%~dp0"
 
 :: get patch tool
-powershell -Command "Invoke-WebRequest https://downloads.sourceforge.net/project/gnuwin32/patch/2.5.9-7/patch-2.5.9-7-bin.zip -OutFile patch.zip" || exit /B 1
+powershell -Command "Invoke-WebRequest https://downloads.sourceforge.net/project/gnuwin32/patch/2.5.9-7/patch-2.5.9-7-bin.zip -MaximumRedirection 10 -OutFile patch.zip" || exit /B 1
 dir
+type patch.zip
 powershell -Command "(Get-FileHash -Algorithm MD5 -Path patch.zip).Hash.equals('b9c8b31d62f4b2e4f1887bbb63e8a905')" || exit /B 1
 7z x patch.zip || exit /B 1
 
