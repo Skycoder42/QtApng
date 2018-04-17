@@ -39,6 +39,7 @@ install:
 
 script:
   - echo "CONFIG += libpng_static" >> .qmake.conf
+  - sudo chmod a+rwx /opt/qt/5.10.1/$PLATFORM/plugins/imageformats/ || true
   - ./qtmodules-travis/ci/$TRAVIS_OS_NAME/build.sh
 
 before_deploy:
