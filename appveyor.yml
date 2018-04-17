@@ -6,12 +6,6 @@ version: build-{build}
 
 environment:
   QT_VER: 5.10.1
-  ZLIB_VERSION: 1.2.11
-  ZLIB_VERSION_P: 1211
-  ZLIB_CHECKSUM: d7510a8ee1918b7d0cad197a089c0a2cd4d6df05fee22389f67f115e738b178d
-  LIBPNG_VERSION: 1.6.34
-  LIBPNG_VERSION_P: 1634
-  LIBPNG_CHECKSUM: 9fe57702faf291504b83786e6516528a
 
   matrix:
     - PLATFORM: msvc2017_64
@@ -46,7 +40,7 @@ install:
   - .\qtmodules-travis\ci\win\setup.bat
 
 build_script:
-  - .\src\3rdparty\appveyor.bat
+  - echo CONFIG += libpng_static >> .qmake.conf
   - .\qtmodules-travis\ci\win\build.bat
 
 after_build:
