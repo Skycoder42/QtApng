@@ -2,12 +2,9 @@
 set -e
 
 if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then
-	which gsha256sum
+	shopt -s expand_aliases
 	alias sha256sum=gsha256sum
 	alias md5sum=gmd5sum
-	which sha256sum
-	gsha256sum --version
-	sha256sum --version
 fi
 
 # update qmake conf
