@@ -1,5 +1,5 @@
-#include "apngimagehandler.h"
-#include "apngreader.h"
+#include "apngimagehandler_p.h"
+#include "apngreader_p.h"
 
 ApngImageHandler::ApngImageHandler() :
 	QImageIOHandler(),
@@ -7,7 +7,7 @@ ApngImageHandler::ApngImageHandler() :
 	_reader(new ApngReader())
 {}
 
-ApngImageHandler::~ApngImageHandler(){}
+ApngImageHandler::~ApngImageHandler() = default;
 
 QByteArray ApngImageHandler::name() const
 {
@@ -75,9 +75,9 @@ bool ApngImageHandler::jumpToImage(int imageNumber)
 {
 	if(!_reader->init(device()))
 		return false;
-	else if((quint32)imageNumber < _reader->frames() &&
+	else if(static_cast<quint32>(imageNumber) < _reader->frames() &&
 			imageNumber >= 0) {
-		_index = imageNumber;
+		_index = static_cast<quint32>(imageNumber);
 		return true;
 	} else
 		return false;
@@ -90,7 +90,7 @@ int ApngImageHandler::loopCount() const
 		if(plays == 0)
 			return -1;
 		else
-			return plays;
+			return static_cast<int>(plays);
 	} else
 		return 0;
 }
@@ -98,7 +98,7 @@ int ApngImageHandler::loopCount() const
 int ApngImageHandler::imageCount() const
 {
 	if(_reader->init(device()))
-		return _reader->frames();
+		return static_cast<int>(_reader->frames());
 	else
 		return 0;
 }
@@ -115,5 +115,5 @@ int ApngImageHandler::nextImageDelay() const
 
 int ApngImageHandler::currentImageNumber() const
 {
-	return _index < _reader->frames() ? _index : -1;
+	return _index < _reader->frames() ? static_cast<int>(_index) : -1;
 }

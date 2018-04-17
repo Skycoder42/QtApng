@@ -1,5 +1,5 @@
-#ifndef APNGIMAGEHANDLER_H
-#define APNGIMAGEHANDLER_H
+#ifndef APNGIMAGEHANDLER_P_H
+#define APNGIMAGEHANDLER_P_H
 
 #include <QImageIOHandler>
 #include <QVariant>
@@ -11,7 +11,7 @@ class ApngImageHandler : public QImageIOHandler
 {
 public:
 	ApngImageHandler();
-	~ApngImageHandler();
+	~ApngImageHandler() override;
 
 	// QImageIOHandler interface
 	QByteArray name() const final;
@@ -31,4 +31,4 @@ private:
 	QScopedPointer<ApngReader> _reader;
 };
 
-#endif // APNGIMAGEHANDLER_H
+#endif // APNGIMAGEHANDLER_P_H

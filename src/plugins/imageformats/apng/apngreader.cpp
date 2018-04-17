@@ -1,4 +1,4 @@
-#include "apngreader.h"
+#include "apngreader_p.h"
 #include <QDebug>
 #include <QImage>
 #include <QRect>
@@ -27,7 +27,7 @@ ApngReader::~ApngReader()
 {
 	if(_png) {
 		_readers.remove(_png);
-		png_destroy_read_struct(&_png, &_info, NULL);
+		png_destroy_read_struct(&_png, &_info, nullptr);
 	}
 
 	if (_frame.rows)
@@ -40,7 +40,7 @@ bool ApngReader::checkPngSig(QIODevice *device)
 {
 	if(device) {
 		auto sig = device->peek(8);
-		if(png_sig_cmp((png_const_bytep)sig.constData(), 0, sig.size()) == 0)
+		if(png_sig_cmp(reinterpret_cast<png_const_bytep>(sig.constData()), 0, static_cast<png_size_t>(sig.size())) == 0)
 			return true;
 	}
 	return false;
@@ -58,7 +58,7 @@ bool ApngReader::init(QIODevice *device)
 		return false;
 
 	//init png structs
-	_png = png_create_read_struct(PNG_LIBPNG_VER_STRING, NULL, NULL, NULL);
+	_png = png_create_read_struct(PNG_LIBPNG_VER_STRING, nullptr, nullptr, nullptr);
 	if(!_png) {
 		qCritical() << "failed to create png struct";
 		return false;
@@ -71,7 +71,7 @@ bool ApngReader::init(QIODevice *device)
 	}
 
 	_readers.insert(_png, this);
-	png_set_progressive_read_fn(_png, NULL, &ApngReader::info_fn, &ApngReader::row_fn, &ApngReader::end_fn);
+	png_set_progressive_read_fn(_png, nullptr, &ApngReader::info_fn, &ApngReader::row_fn, &ApngReader::end_fn);
 
 	//set png jump position
 	if (setjmp(png_jmpbuf(_png))) {
@@ -90,7 +90,12 @@ bool ApngReader::init(QIODevice *device)
 
 ApngReader::ApngFrame ApngReader::readFrame(quint32 index)
 {
-	if(index < (quint32)_allFrames.size())
+	return readFrame(static_cast<int>(index));
+}
+
+ApngReader::ApngFrame ApngReader::readFrame(int index)
+{
+	if(index < _allFrames.size())
 		return _allFrames[index];
 
 	if (setjmp(png_jmpbuf(_png)))
@@ -99,9 +104,9 @@ ApngReader::ApngFrame ApngReader::readFrame(quint32 index)
 	auto valid = false;
 	do {
 		valid = readChunk();
-	} while(valid && index >= (quint32)_allFrames.size());
+	} while(valid && index >= _allFrames.size());
 
-	if(index < (quint32)_allFrames.size())
+	if(index < _allFrames.size())
 		return _allFrames[index];
 	else
 		return ApngFrame();
@@ -158,7 +163,9 @@ void ApngReader::info_fn(png_structp png_ptr, png_infop info_ptr)
 		frame.rows[j] = frame.p + j * frame.rowbytes;
 
 	// init image
-	reader->_lastImg = QImage(frame.width, frame.height, QImage::Format_ARGB32);
+	reader->_lastImg = QImage(static_cast<int>(frame.width),
+							  static_cast<int>(frame.height),
+							  QImage::Format_ARGB32);
 	reader->_lastImg.fill(Qt::black);
 
 	//read apng information
@@ -253,9 +260,11 @@ void ApngReader::frame_end_fn(png_structp png_ptr, png_uint_32 frame_num)
 	if (frame.dop == PNG_DISPOSE_OP_PREVIOUS)
 		image = temp;
 	else if (frame.dop == PNG_DISPOSE_OP_BACKGROUND) {
-		for(quint32 y = 0; y < frame.height; y++) {
-			for(quint32 x = 0; x < frame.width; x++)
-				image.setPixelColor(x + frame.x, y + frame.y, Qt::black);
+		for(auto y = 0u; y < frame.height; y++) {
+			for(auto x = 0u; x < frame.width; x++)
+				image.setPixelColor(static_cast<int>(x + frame.x),
+									static_cast<int>(y + frame.y),
+									Qt::black);
 		}
 	}
 }
@@ -267,15 +276,14 @@ bool ApngReader::readChunk(quint32 len)
 		//read 4 bytes -> size
 		data = _device->read(4);
 		if(data.size() == 4) {
-			len = *((quint32*)data.constData());
-			len = qFromBigEndian(len) + 8;//type (4b) + crc (4b)
+			len = qFromBigEndian<quint32>(data.constData()) + 8u;//type (4b) + crc (4b)
 			data += _device->read(len);
 		}
 		//is save for invalid data, as at least 4 byte are always read
 	} else
 		data = _device->read(len);
 	if(!data.isEmpty())
-		png_process_data(_png, _info, (png_bytep)data.data(), data.size());
+		png_process_data(_png, _info, reinterpret_cast<png_bytep>(data.data()), static_cast<png_size_t>(data.size()));
 	return !_device->atEnd();
 }
 
@@ -291,7 +299,9 @@ void ApngReader::copyOver()
 			c.setRed(_frame.rows[y][px+2]);
 			c.setAlpha(_frame.rows[y][px+3]);
 
-			_lastImg.setPixelColor(x + _frame.x, y + _frame.y, c);
+			_lastImg.setPixelColor(static_cast<int>(x + _frame.x),
+								   static_cast<int>(y + _frame.y),
+								   c);
 		}
 	}
 }
@@ -308,10 +318,13 @@ void ApngReader::blendOver()
 			src.setRed(_frame.rows[y][px+2]);
 			src.setAlpha(_frame.rows[y][px+3]);
 
-			if(src.alpha() == 0xFF)
-				_lastImg.setPixelColor(x + _frame.x, y + _frame.y, src);
-			else if(src.alpha() != 0x00) {
-				auto dst = _lastImg.pixelColor(x + _frame.x, y + _frame.y);
+			if(src.alpha() == 0xFF) {
+				_lastImg.setPixelColor(static_cast<int>(x + _frame.x),
+									   static_cast<int>(y + _frame.y),
+									   src);
+			} else if(src.alpha() != 0x00) {
+				auto dst = _lastImg.pixelColor(static_cast<int>(x + _frame.x),
+											   static_cast<int>(y + _frame.y));
 
 				//do porter-duff blending
 				if(dst.alpha() != 0x00) {
@@ -324,7 +337,9 @@ void ApngReader::blendOver()
 					src.setAlpha(al/255);
 				}
 
-				_lastImg.setPixelColor(x + _frame.x, y + _frame.y, src);
+				_lastImg.setPixelColor(static_cast<int>(x + _frame.x),
+									   static_cast<int>(y + _frame.y),
+									   src);
 			}
 		}
 	}
@@ -334,7 +349,7 @@ void ApngReader::blendOver()
 
 ApngReader::ApngFrame::ApngFrame(const QImage &image, quint16 delay_num, quint16 delay_den) :
 	QImage(image),
-	_delay((double)delay_num / (double)delay_den)
+	_delay(static_cast<double>(delay_num) / static_cast<double>(delay_den))
 {}
 
 double ApngReader::ApngFrame::delay() const

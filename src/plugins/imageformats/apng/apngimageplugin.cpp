@@ -1,6 +1,6 @@
 #include "apngimageplugin.h"
-#include "apngimagehandler.h"
-#include "apngreader.h"
+#include "apngimagehandler_p.h"
+#include "apngreader_p.h"
 
 ApngImagePlugin::ApngImagePlugin(QObject *parent) :
 	QImageIOPlugin(parent)
@@ -10,11 +10,11 @@ QImageIOPlugin::Capabilities ApngImagePlugin::capabilities(QIODevice *device, co
 {
 	if (format == "apng") {
 		if(device && device->bytesAvailable() >= 8)
-			return ApngReader::checkPngSig(device) ? CanRead : (Capability)0;
+			return ApngReader::checkPngSig(device) ? CanRead : static_cast<Capability>(0);
 		else
 			return CanRead;
 	} else
-		return 0;
+		return static_cast<Capability>(0);
 }
 
 QImageIOHandler *ApngImagePlugin::create(QIODevice *device, const QByteArray &format) const

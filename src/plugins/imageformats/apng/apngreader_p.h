@@ -1,5 +1,5 @@
-#ifndef APNGREADER_H
-#define APNGREADER_H
+#ifndef APNGREADER_P_H
+#define APNGREADER_P_H
 
 #include <QObject>
 #include <QIODevice>
@@ -30,12 +30,13 @@ public:
 	};
 
 	explicit ApngReader(QObject *parent = nullptr);
-	~ApngReader();
+	~ApngReader() override;
 
 	static bool checkPngSig(QIODevice *device);
 
 	bool init(QIODevice *device);
 	ApngFrame readFrame(quint32 index);
+	ApngFrame readFrame(int index);
 
 	bool isAnimated() const;
 	QSize size() const;
@@ -70,7 +71,7 @@ private:
 		quint8 dop;
 		quint8 bop;
 
-		quint32 rowbytes;
+		quint64 rowbytes;
 		unsigned char * p;
 		png_bytepp rows;
 
@@ -93,4 +94,4 @@ private:
 	void blendOver();
 };
 
-#endif // APNGREADER_H
+#endif // APNGREADER_P_H

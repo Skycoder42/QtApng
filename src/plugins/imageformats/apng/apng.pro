@@ -1,8 +1,8 @@
 TARGET  = qapng
 
 HEADERS += apngimageplugin.h \
-	apngimagehandler.h \
-	apngreader.h
+    apngreader_p.h \
+    apngimagehandler_p.h
 
 SOURCES += apngimageplugin.cpp \
 	apngimagehandler.cpp \
