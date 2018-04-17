@@ -4,20 +4,14 @@
 #include <QImageReader>
 #include <QMovie>
 
-static void ln_plugin() {
-	Q_ASSERT(QFile::copy(QStringLiteral(OUTDIR) + QStringLiteral("../../../../plugins/imageformats/libqapng.so"),
-						QStringLiteral(PLGDIR) + QStringLiteral("imageformats/libqapng.so")));
-	qAddPostRoutine([](){
-		Q_ASSERT(QFile::remove(QStringLiteral(PLGDIR) + QStringLiteral("imageformats/libqapng.so")));
-	});
-}
-Q_COREAPP_STARTUP_FUNCTION(ln_plugin)
-
 class ApngPluginTest : public QObject
 {
 	Q_OBJECT
 
 private Q_SLOTS:
+	void initTestCase();
+	void cleanupTestCase();
+
 	void testFormats();
 
 	void testImageReading_data();
@@ -25,6 +19,28 @@ private Q_SLOTS:
 	void testAnimation_data();
 	void testAnimation();
 };
+
+void ApngPluginTest::initTestCase()
+{
+	QDir srcPath = QStringLiteral(OUTDIR) + QStringLiteral("../../../../plugins/imageformats");
+	QDir outPath = QStringLiteral(PLGDIR) + QStringLiteral("imageformats/");
+	for(auto plg : srcPath.entryInfoList({QStringLiteral("*apng.*")})) {
+		auto fPath = outPath.absoluteFilePath(plg.fileName());
+		qDebug() << "Staging plugin " << plg.absoluteFilePath() << "to" << fPath;
+		if(QFile::exists(fPath))
+			QVERIFY(QFile::remove(fPath));
+		QVERIFY(QFile::copy(plg.absoluteFilePath(), fPath));
+	}
+}
+
+void ApngPluginTest::cleanupTestCase()
+{
+	QDir outPath = QStringLiteral(PLGDIR) + QStringLiteral("imageformats/");
+	for(auto plg : outPath.entryInfoList({QStringLiteral("*apng.*")})) {
+		qDebug() << "Removing staged plugin " << plg.absoluteFilePath();
+		QVERIFY(QFile::remove(plg.absoluteFilePath()));
+	}
+}
 
 void ApngPluginTest::testFormats()
 {
