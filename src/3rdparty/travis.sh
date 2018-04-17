@@ -1,5 +1,4 @@
-#!/bin/sh
-# $1 libpng version
+#!/bin/bash
 set -e
 
 # update qmake conf
