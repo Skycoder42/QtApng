@@ -25,6 +25,8 @@ void ApngPluginTest::initTestCase()
 	QDir srcPath = QStringLiteral(OUTDIR) + QStringLiteral("../../../../plugins/imageformats");
 	QDir outPath = QStringLiteral(PLGDIR) + QStringLiteral("imageformats/");
 	for(auto plg : srcPath.entryInfoList({QStringLiteral("*apng*")})) {
+		if(!plg.isFile())
+			continue;
 		auto fPath = outPath.absoluteFilePath(plg.fileName());
 		qDebug() << "Staging plugin " << plg.absoluteFilePath() << "to" << fPath;
 		if(QFile::exists(fPath))
