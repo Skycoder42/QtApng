@@ -24,7 +24,7 @@ void ApngPluginTest::initTestCase()
 {
 	QDir srcPath = QStringLiteral(OUTDIR) + QStringLiteral("../../../../plugins/imageformats");
 	QDir outPath = QStringLiteral(PLGDIR) + QStringLiteral("imageformats/");
-	for(auto plg : srcPath.entryInfoList({QStringLiteral("*apng.*")})) {
+	for(auto plg : srcPath.entryInfoList({QStringLiteral("*apng*")})) {
 		auto fPath = outPath.absoluteFilePath(plg.fileName());
 		qDebug() << "Staging plugin " << plg.absoluteFilePath() << "to" << fPath;
 		if(QFile::exists(fPath))
@@ -36,7 +36,7 @@ void ApngPluginTest::initTestCase()
 void ApngPluginTest::cleanupTestCase()
 {
 	QDir outPath = QStringLiteral(PLGDIR) + QStringLiteral("imageformats/");
-	for(auto plg : outPath.entryInfoList({QStringLiteral("*apng.*")})) {
+	for(auto plg : outPath.entryInfoList({QStringLiteral("*apng*")})) {
 		qDebug() << "Removing staged plugin " << plg.absoluteFilePath();
 		QVERIFY(QFile::remove(plg.absoluteFilePath()));
 	}
