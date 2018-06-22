@@ -52,7 +52,7 @@ deploy:
   file_glob: true
   file: install/build_*_$QT_VER.tar.xz
   on:
-    repo: Skycoder42/qapng
+    repo: Skycoder42/QtApng
     tags: true
 
 before_cache:
