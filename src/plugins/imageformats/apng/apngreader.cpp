@@ -152,7 +152,7 @@ void ApngReader::info_fn(png_structp png_ptr, png_infop info_ptr)
 	png_set_expand(png_ptr);
 	png_set_strip_16(png_ptr);
 	png_set_gray_to_rgb(png_ptr);
-	png_set_add_alpha(png_ptr, 0xff, PNG_FILLER_AFTER);
+	png_set_add_alpha(png_ptr, 0xFF, PNG_FILLER_AFTER);
 	png_set_bgr(png_ptr);
 	(void)png_set_interlace_handling(png_ptr);
 	png_read_update_info(png_ptr, info_ptr);
@@ -177,7 +177,7 @@ void ApngReader::info_fn(png_structp png_ptr, png_infop info_ptr)
 	reader->_lastImg = QImage(static_cast<int>(frame.width),
 							  static_cast<int>(frame.height),
 							  QImage::Format_ARGB32);
-	reader->_lastImg.fill(Qt::black);
+	reader->_lastImg.fill(Qt::transparent);
 
 	//read apng information
 	if (png_get_valid(png_ptr, info_ptr, PNG_INFO_acTL)) {
@@ -291,7 +291,7 @@ void ApngReader::frame_end_fn(png_structp png_ptr, png_uint_32 frame_num)
 			for(auto x = 0u; x < frame.width; x++)
 				image.setPixelColor(static_cast<int>(x + frame.x),
 									static_cast<int>(y + frame.y),
-									Qt::black);
+									Qt::transparent);
 		}
 	}
 }
