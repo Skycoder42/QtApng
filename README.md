@@ -10,7 +10,7 @@ apng image plugin for Qt to support animated PNGs
 Enable the usage of apng images with Qt. The plugin adds the apng format as a new format for any Qt application, and thus supports loading of apng images via `QMovie`, `AnimatedImage` and other types.
 
 ## Requirements
-To build the plugin, libpng with the apng patch applied is required. By default the libpng prodived by `pkg-config` used for unix like systems. If the library is not available, the project will compile a static library of libpng and embedd it into the plugin. You can force this behaviour by running qmake with `CONFIG += libpng_static`
+To build the plugin, libpng with the apng patch applied is required. By default the libpng provided by `pkg-config` is used for unix-like systems. If the library is not available, the project will compile a static library of libpng and embedd it into the plugin. You can force this behaviour by running qmake with `CONFIG += libpng_static`
 
 ### Embedded libpng/zlib
 The project comes with a version of zlib and libpng (with the apng patch). They can be found in the `src/3rdparty` subfolder. They are automatically compiled into static libraries and used to link the apng plugin when neccessary. Please note that both libraries are compiled without any optimizations for architecture etc. If you wish to have those features, you can replace those two by your own versions.
