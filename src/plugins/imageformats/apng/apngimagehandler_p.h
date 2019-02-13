@@ -28,7 +28,7 @@ public:
 	int currentImageNumber() const final;
 
 private:
-	quint32 _index;
+	quint32 _index = 0;
 	QScopedPointer<ApngReader> _reader;
 };
 

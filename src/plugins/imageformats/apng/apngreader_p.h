@@ -48,36 +48,34 @@ private:
 	static QMutex _readerMutex;
 	static QHash<png_structp, ApngReader*> _readers;
 
-	QIODevice *_device;
+	QIODevice *_device = nullptr;
 
-	png_structp _png;
-	png_infop _info;
+	png_structp _png = nullptr;
+	png_infop _info = nullptr;
 
 	//image info
-	bool _infoRead;
-	bool _animated;
-	bool _skipFirst;
+	bool _infoRead = false;
+	bool _animated = false;
+	bool _skipFirst = false;
 	QSize _imageSize;
-	quint32 _frameCount;
-	quint32 _plays;
+	quint32 _frameCount = 1;
+	quint32 _plays = 0;
 
 	struct Frame {
-		quint32 x;
-		quint32 y;
-		quint32 width;
-		quint32 height;
-		quint32 channels;
+		quint32 x = 0;
+		quint32 y = 0;
+		quint32 width = 0;
+		quint32 height = 0;
+		quint32 channels = 0;
 
-		quint16 delay_num;
-		quint16 delay_den;
-		quint8 dop;
-		quint8 bop;
+		quint16 delay_num = 0;
+		quint16 delay_den = 1;
+		quint8 dop = PNG_DISPOSE_OP_NONE;
+		quint8 bop = PNG_BLEND_OP_SOURCE;
 
-		quint64 rowbytes;
-		unsigned char * p;
-		png_bytepp rows;
-
-		Frame();
+		quint64 rowbytes = 0;
+		unsigned char * p = nullptr;
+		png_bytepp rows = nullptr;
 	} _frame;
 
 	QImage _lastImg;

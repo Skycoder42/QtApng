@@ -2,9 +2,8 @@
 #include "apngreader_p.h"
 
 ApngImageHandler::ApngImageHandler() :
-	QImageIOHandler(),
-	_index(0),
-	_reader(new ApngReader())
+	QImageIOHandler{},
+	_reader{new ApngReader{}}
 {}
 
 ApngImageHandler::~ApngImageHandler() = default;

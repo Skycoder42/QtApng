@@ -9,19 +9,7 @@ QMutex ApngReader::_readerMutex;
 QHash<png_structp, ApngReader*> ApngReader::_readers;
 
 ApngReader::ApngReader(QObject *parent) :
-	QObject(parent),
-	_device(nullptr),
-	_png(nullptr),
-	_info(nullptr),
-	_infoRead(false),
-	_animated(false),
-	_skipFirst(false),
-	_imageSize(),
-	_frameCount(1),
-	_plays(0),
-	_frame(),
-	_lastImg(),
-	_allFrames()
+	QObject{parent}
 {}
 
 ApngReader::~ApngReader()
@@ -388,20 +376,3 @@ int ApngReader::ApngFrame::delayMsec() const
 {
 	return qRound(_delay * 1000);
 }
-
-
-
-ApngReader::Frame::Frame() :
-	x(0),
-	y(0),
-	width(0),
-	height(0),
-	channels(0),
-	delay_num(0),
-	delay_den(1),
-	dop(PNG_DISPOSE_OP_NONE),
-	bop(PNG_BLEND_OP_SOURCE),
-	rowbytes(0),
-	p(nullptr),
-	rows(nullptr)
-{}
