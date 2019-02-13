@@ -1,9 +1,9 @@
-# qapng
+# QtApng
 apng image plugin for Qt to support animated PNGs
 
-[![Travis Build Status](https://travis-ci.org/Skycoder42/qapng.svg?branch=master)](https://travis-ci.org/Skycoder42/qapng)
-[![Appveyor Build status](https://ci.appveyor.com/api/projects/status/ct2nkn1yw20wgt52?svg=true)](https://ci.appveyor.com/project/Skycoder42/qapng)
-[![Codacy Badge](https://api.codacy.com/project/badge/Grade/ff6fe2b9ed6247939a006ab68f7d45b8)](https://www.codacy.com/app/Skycoder42/qapng)
+[![Travis Build Status](https://travis-ci.org/Skycoder42/QtApng.svg?branch=master)](https://travis-ci.org/Skycoder42/QtApng)
+[![Appveyor Build status](https://ci.appveyor.com/api/projects/status/gdfl5n2kblw6x0fu?svg=true)](https://ci.appveyor.com/project/Skycoder42/qtapng)
+[![Codacy Badge](https://api.codacy.com/project/badge/Grade/c2a4d6813a07497784580e79475a314e)](https://www.codacy.com/app/Skycoder42/QtApng)
 [![AUR](https://img.shields.io/aur/version/qt5-apng-plugin.svg)](https://aur.archlinux.org/pkgbase/qt5-apng-plugin/)
 
 ## Features
@@ -35,7 +35,6 @@ The project comes with a version of zlib and libpng (with the apng patch). They 
 3. Download the compiled modules from the release page. **Note:** You will have to add the correct ones yourself and may need to adjust some paths to fit your installation! In addition to that, you will have to download the modules this one depends on as well. See Section "Requirements" below.
 4. Build it yourself! **Note:** This requires all build an runtime dependencies to be available (See Section "Requirements" below). If you don't have/need cmake, you can ignore the related warnings. To automatically build and install to your Qt installation, run:
 	- `qmake`
-	- `make qmake_all`
 	- `make` (If you want the tests/examples/etc. run `make all`)
 	- `make install`
 
