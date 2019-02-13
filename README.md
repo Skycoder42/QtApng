@@ -18,8 +18,8 @@ The project comes with a version of zlib and libpng (with the apng patch). They 
  Project	| Version	| License																	| Project page
 ------------|-----------|---------------------------------------------------------------------------|--------------
  zlib		| 1.2.11	| [zlib-license](https://www.zlib.net/zlib_license.html)					| https://www.zlib.net/
- libpng		| 1.6.34	| [libpng-license](http://www.libpng.org/pub/png/src/libpng-LICENSE.txt)	| http://www.libpng.org/pub/png/libpng.html
- apng patch	| 1.6.34	| [libpng-license](http://www.libpng.org/pub/png/src/libpng-LICENSE.txt)	| https://sourceforge.net/projects/libpng-apng/
+ libpng		| 1.6.36	| [libpng-license](http://www.libpng.org/pub/png/src/libpng-LICENSE.txt)	| http://www.libpng.org/pub/png/libpng.html
+ apng patch	| 1.6.36	| [libpng-license](http://www.libpng.org/pub/png/src/libpng-LICENSE.txt)	| https://sourceforge.net/projects/libpng-apng/
 
 ## Download/Installation
 1. Package Managers: The library is available via:

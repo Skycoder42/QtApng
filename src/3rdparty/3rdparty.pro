@@ -1,5 +1,6 @@
 TEMPLATE = subdirs
 
-SUBDIRS += zlib libpng
-
-libpng.depends += zlib
+!system_libpng {
+	SUBDIRS += zlib libpng
+	libpng.depends += zlib
+}

@@ -1,32 +1,19 @@
 TEMPLATE = lib
 
-TARGET = png
+TARGET = qtapng_png
 
 QT =
 
 CONFIG -= qt
-CONFIG += \
-	static \
-	hide_symbols \
-	exceptions_off rtti_off warn_off
+CONFIG += static hide_symbols exceptions_off rtti_off warn_off
 
 DEFINES += PNG_ARM_NEON_OPT=0
+
+HEADERS += $$files(src/*.h)
+SOURCES += $$files(src/*.c)
+SOURCES -= src/example.c
+
 MODULE_INCLUDEPATH = $$PWD
 load(qt_helper_lib)
 
-HEADERS += $$files(*.h)
-SOURCES += $$files(*.c)
-SOURCES -= example.c
-
-win32:CONFIG(release, debug|release): LIBS += -L$$OUT_PWD/../../../lib/ -lz
-else:win32:CONFIG(debug, debug|release): LIBS += -L$$OUT_PWD/../../../lib/ -lzd
-else:unix: LIBS += -L$$OUT_PWD/../../../lib/ -lz
-
-INCLUDEPATH += $$PWD/../zlib
-DEPENDPATH += $$PWD/../zlib
-
-win32-g++:CONFIG(release, debug|release): PRE_TARGETDEPS += $$OUT_PWD/../../../lib/libz.a
-else:win32-g++:CONFIG(debug, debug|release): PRE_TARGETDEPS += $$OUT_PWD/../../../lib/libzd.a
-else:win32:!win32-g++:CONFIG(release, debug|release): PRE_TARGETDEPS += $$OUT_PWD/../../../lib/z.lib
-else:win32:!win32-g++:CONFIG(debug, debug|release): PRE_TARGETDEPS += $$OUT_PWD/../../../lib/zd.lib
-else:unix: PRE_TARGETDEPS += $$OUT_PWD/../../../lib/libz.a
+QMAKE_USE_PRIVATE += apng_zlib

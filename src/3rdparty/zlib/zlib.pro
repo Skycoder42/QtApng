@@ -1,17 +1,14 @@
 TEMPLATE = lib
 
-TARGET = z
+TARGET = qtapng_zlib
 
 QT =
 
 CONFIG -= qt
-CONFIG += \
-	static \
-	hide_symbols \
-	exceptions_off rtti_off warn_off
+CONFIG += static exceptions_off rtti_off warn_off
+
+HEADERS += $$files(src/*.h)
+SOURCES += $$files(src/*.c)
 
 MODULE_INCLUDEPATH = $$PWD
 load(qt_helper_lib)
-
-HEADERS += $$files(*.h)
-SOURCES += $$files(*.c)
