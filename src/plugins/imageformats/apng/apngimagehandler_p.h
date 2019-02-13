@@ -9,6 +9,7 @@ class ApngReader;
 
 class ApngImageHandler : public QImageIOHandler
 {
+	Q_DISABLE_COPY(ApngImageHandler)
 public:
 	ApngImageHandler();
 	~ApngImageHandler() override;
