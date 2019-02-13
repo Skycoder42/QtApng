@@ -7,13 +7,7 @@ QT =
 CONFIG -= qt
 CONFIG += static hide_symbols exceptions_off rtti_off warn_off
 
-android:equals(ANDROID_TARGET_ARCH, armeabi-v7a) {
-	QMAKE_CFLAGS -= -mfpu=vfp
-	QMAKE_CFLAGS += -mfpu=neon
-	QMAKE_CXXFLAGS -= -mfpu=vfp
-	QMAKE_CXXFLAGS += -mfpu=neon
-	CONFIG += neon
-}
+DEFINES += PNG_ARM_NEON_OPT=0
 
 HEADERS += $$files(src/*.h)
 SOURCES += $$files(src/*.c)
