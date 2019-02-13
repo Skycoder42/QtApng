@@ -9,9 +9,11 @@ osx_image: xcode10.1
 
 env:
   global:
-    - QPMX_CACHE_DIR=$HOME/.qpmx-cache
-    - QT_VER=5.12.0
+    - QDEP_CACHE_DIR=$HOME/.qdep-cache
+    - QT_VER=5.12.1
     - DOCKER_IMAGE=base
+    - MAKE_RUN_TESTS=true
+    - TARGET_NAME=qtapng
 
 matrix:
   include:
@@ -41,7 +43,6 @@ install:
   - travis_wait 40 ./qtmodules-travis/ci/$TRAVIS_OS_NAME/setup.sh
 
 script:
-  - echo "CONFIG += libpng_static" >> .qmake.conf
   - if [ "$TRAVIS_OS_NAME" == "osx" ]; then sudo chmod -R a+rwx /opt/qt/$QT_VER/$PLATFORM/plugins/imageformats; fi
   - ./qtmodules-travis/ci/$TRAVIS_OS_NAME/build.sh
 
@@ -53,7 +54,7 @@ deploy:
   api_key:
     secure: rcdY0c8fX3oxFqMLGGBiAt7Dv4M/eJsHLCPYAE9V/ItEzbvGvnUnoAsZXBEZszTgIeIGqTcIjnYnmQ0dl4f54dDfeW29DAiurpWT+dZ228A1SyFD7FVz1PzSbtagHLdaV2cWT/ez8wKWgEyEVDEgam7o2O0O+W91jQZO74YEYfHmj+Hro0C3fMqFXDwY7phL/G1MGY9P2lwU0Uoo+0OrV/42RhjFoKPG7kN2RMd/Z91jlhWyBQZvBQZ9aOiGQyRe0Y9tNjnhpSbuEbZp/jSlR62Nf0ZGmCm0lSxtH/G1Y/l4bzvknHvP4k0hg91E93IQLbSkuXCOeVa3/ghgN0m9gL+S1OVGOOftEeXQOCVI14IMkmv0vC5VdzfVY/dIFwFJG20uLylFEz/RupLZEmg7JONUJvbJYl5ABP9End2HScM2E+GDlvSHeoPbSX2hcKqcxZy5mIWdc5ie7s4m/ft1aRAryMEwGf3TbwMQRC8oLkJ9p3COPKPqKwqolLHv4wR1ei7p2caldtygfcv/JEK+jZwyox6m8YJkcI4D1rolNGmXCt1Btn1BkotH9p6oHsG18unspcY+r2IZVNhM+INegOnlzMRku0WoEuh02Qrv79lKfQ8Kw4sZhhL58Iy/K/7rQ8hM2fH+ODb5OT6w4htRolimkMV9HOsDjLPqc2u8h+A=
   file_glob: true
-  file: install/build_*_$QT_VER.tar.xz
+  file: install/${TARGET_NAME}_*_$QT_VER.tar.xz
   on:
     repo: Skycoder42/QtApng
     tags: true
@@ -61,11 +62,9 @@ deploy:
 before_cache:
   - rm -f  $HOME/.gradle/caches/modules-2/modules-2.lock
   - rm -fr $HOME/.gradle/caches/*/plugin-resolution/
-  - rm -fr $QPMX_CACHE_DIR/locks
-  - rm -fr $QPMX_CACHE_DIR/tmp
 cache:
   directories:
     - $HOME/.gradle/caches/
     - $HOME/.gradle/wrapper/
     - $HOME/.android/build-cache
-    - $QPMX_CACHE_DIR
+    - $QDEP_CACHE_DIR
