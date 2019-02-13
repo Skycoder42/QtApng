@@ -1,23 +1,20 @@
-#-------------------------------------------------
-#
-# Project created by QtCreator 2017-08-14T12:45:16
-#
-#-------------------------------------------------
-
-QT       += testlib
-
-TARGET = tst_apngplugin
-CONFIG   += console
-CONFIG   -= app_bundle
-
 TEMPLATE = app
 
-SOURCES += \
-		tst_apngplugin.cpp
+QT += testlib
+
+CONFIG += console
+CONFIG -= app_bundle
+
+TARGET = tst_apngplugin
 
 DEFINES += SRCDIR=\\\"$$PWD/\\\"
 DEFINES += OUTDIR=\\\"$$OUT_PWD/\\\"
 DEFINES += PLGDIR=\\\"$$[QT_INSTALL_PLUGINS]/\\\"
 
+SOURCES += \
+	tst_apngplugin.cpp
+
 RESOURCES += \
-    tst_apngplugin.qrc
+	tst_apngplugin.qrc
+
+include(../../testrun.pri)
