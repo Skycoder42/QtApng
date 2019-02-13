@@ -25,8 +25,7 @@ bool ApngImageHandler::read(QImage *image)
 {
 	if(!_reader->init(device()))
 		return false;
-	*image = _reader->readFrame(_index);
-	_index++;
+	*image = _reader->readFrame(_index++);
 	return !image->isNull();
 }
 
@@ -106,10 +105,12 @@ int ApngImageHandler::nextImageDelay() const
 {
 	if(!_reader->init(device()))
 		return false;
-	else if(_index >= _reader->frames())
+	if(_index == 0)
+		return 0;
+	else if(_index > _reader->frames())
 		return _reader->readFrame(0).delayMsec();
 	else
-		return _reader->readFrame(_index).delayMsec();
+		return _reader->readFrame(_index - 1).delayMsec();
 }
 
 int ApngImageHandler::currentImageNumber() const

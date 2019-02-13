@@ -24,7 +24,7 @@ void ApngPluginTest::initTestCase()
 {
 	QDir srcPath = QStringLiteral(OUTDIR) + QStringLiteral("../../../../plugins/imageformats");
 	QDir outPath = QStringLiteral(PLGDIR) + QStringLiteral("imageformats/");
-	for(auto plg : srcPath.entryInfoList({QStringLiteral("*apng*")})) {
+	for(const auto &plg : srcPath.entryInfoList({QStringLiteral("*apng*")})) {
 		if(!plg.isFile())
 			continue;
 		auto fPath = outPath.absoluteFilePath(plg.fileName());
@@ -38,7 +38,7 @@ void ApngPluginTest::initTestCase()
 void ApngPluginTest::cleanupTestCase()
 {
 	QDir outPath = QStringLiteral(PLGDIR) + QStringLiteral("imageformats/");
-	for(auto plg : outPath.entryInfoList({QStringLiteral("*apng*")})) {
+	for(const auto &plg : outPath.entryInfoList({QStringLiteral("*apng*")})) {
 		qDebug() << "Removing staged plugin " << plg.absoluteFilePath()
 				 << "=>" << QFile::remove(plg.absoluteFilePath());
 	}
@@ -62,19 +62,19 @@ void ApngPluginTest::testImageReading_data()
 							  << true
 							  << QSize(320, 240)
 							  << QPoint(211, 25)
-							  << QColor("#e80000");
+							  << QColor(0xe8, 0x00, 0x00);
 
 	QTest::newRow("sample-2") << QStringLiteral(":/testdata/sample-2.apng")
 							  << true
 							  << QSize(150, 150)
 							  << QPoint(74, 34)
-							  << QColor("#d40000");
+							  << QColor(0xd4, 0x00, 0x00);
 
 	QTest::newRow("sample-3") << QStringLiteral(":/testdata/sample-3.apng")
 							  << true
 							  << QSize(150, 150)
 							  << QPoint(74, 34)
-							  << QColor("#d40000");
+							  << QColor(0xd4, 0x00, 0x00);
 
 	QTest::newRow("sample-4") << QStringLiteral(":/testdata/sample-4.apng")
 							  << false
@@ -147,7 +147,7 @@ void ApngPluginTest::testAnimation()
 	QCOMPARE(reader.supportsAnimation(), animated);
 	QCOMPARE(reader.imageCount(), frames);
 	QCOMPARE(reader.currentImageNumber(), 0);
-	QCOMPARE(reader.nextImageDelay(), frame0Delay);
+	QCOMPARE(reader.nextImageDelay(), 0);
 	QCOMPARE(reader.loopCount(), loops);
 
 	if(!animated)
@@ -155,6 +155,7 @@ void ApngPluginTest::testAnimation()
 
 	//test frame jumping
 	QVERIFY(reader.jumpToNextImage());
+	QCOMPARE(reader.nextImageDelay(), frame0Delay);
 	QVERIFY(reader.jumpToImage(frames - 1));
 	QVERIFY(!reader.jumpToNextImage());
 	QVERIFY(!reader.jumpToImage(frames));
