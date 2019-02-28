@@ -18,6 +18,7 @@ private Q_SLOTS:
 	void testImageReading();
 	void testAnimation_data();
 	void testAnimation();
+	void testFrameDelays();
 };
 
 void ApngPluginTest::initTestCase()
@@ -175,6 +176,31 @@ void ApngPluginTest::testAnimation()
 		QCOMPARE(reader.currentImageNumber(), c);
 	};
 	QCOMPARE(cnt, frames);
+}
+
+void ApngPluginTest::testFrameDelays()
+{
+	QImageReader reader(QStringLiteral(":/testdata/sample-5.apng"), "apng");
+
+	//test general stuff
+	QVERIFY(reader.supportsAnimation());
+	QCOMPARE(reader.imageCount(), 4);
+	QCOMPARE(reader.currentImageNumber(), 0);
+	QCOMPARE(reader.nextImageDelay(), 0);
+	QCOMPARE(reader.loopCount(), -1);
+
+	QList<QPair<int, bool>> delays {
+		{2000, true},
+		{500, true},
+		{1000, true},
+		{500, false},
+		{0, false}
+	};
+	while(!delays.isEmpty()) {
+		const auto dInfo = delays.takeFirst();
+		QCOMPARE(reader.jumpToNextImage(), dInfo.second);
+		QCOMPARE(reader.nextImageDelay(), dInfo.first);
+	}
 }
 
 QTEST_MAIN(ApngPluginTest)

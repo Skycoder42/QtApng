@@ -94,7 +94,7 @@ ApngReader::ApngFrame ApngReader::readFrame(int index)
 		return _allFrames[index];
 
 	if (setjmp(png_jmpbuf(_png)))
-		return ApngFrame();
+		return {};
 
 	auto valid = false;
 	do {
@@ -104,7 +104,7 @@ ApngReader::ApngFrame ApngReader::readFrame(int index)
 	if(index < _allFrames.size())
 		return _allFrames[index];
 	else
-		return ApngFrame();
+		return {};
 }
 
 bool ApngReader::isAnimated() const
@@ -363,8 +363,8 @@ void ApngReader::blendOver()
 
 
 ApngReader::ApngFrame::ApngFrame(const QImage &image, quint16 delay_num, quint16 delay_den) :
-	QImage(image),
-	_delay(static_cast<double>(delay_num) / static_cast<double>(delay_den))
+	QImage{image},
+	_delay{static_cast<double>(delay_num) / static_cast<double>(delay_den)}
 {}
 
 double ApngReader::ApngFrame::delay() const

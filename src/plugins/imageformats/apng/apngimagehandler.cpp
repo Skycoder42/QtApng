@@ -62,23 +62,16 @@ bool ApngImageHandler::jumpToNextImage()
 {
 	if(!_reader->init(device()))
 		return false;
-	else if(_index < _reader->frames() - 1) {
-		++_index;
-		return true;
-	} else
-		return false;
+	else
+		return (++_index < _reader->frames());
 }
 
 bool ApngImageHandler::jumpToImage(int imageNumber)
 {
-	if(!_reader->init(device()))
+	if(!_reader->init(device()) || imageNumber < 0)
 		return false;
-	else if(static_cast<quint32>(imageNumber) < _reader->frames() &&
-			imageNumber >= 0) {
-		_index = static_cast<quint32>(imageNumber);
-		return true;
-	} else
-		return false;
+	_index = static_cast<quint32>(imageNumber);
+	return _index < _reader->frames();
 }
 
 int ApngImageHandler::loopCount() const
@@ -105,10 +98,8 @@ int ApngImageHandler::nextImageDelay() const
 {
 	if(!_reader->init(device()))
 		return false;
-	if(_index == 0)
+	if(_index == 0 || _index > _reader->frames())
 		return 0;
-	else if(_index > _reader->frames())
-		return _reader->readFrame(0).delayMsec();
 	else
 		return _reader->readFrame(_index - 1).delayMsec();
 }
