@@ -5,7 +5,6 @@
 #include <QIODevice>
 #include <png.h>
 #include <QImage>
-#include <QMutex>
 
 #ifndef PNG_APNG_SUPPORTED
 #error libpng with APNG patch is required
@@ -45,9 +44,6 @@ public:
 	quint32 plays() const;
 
 private:
-	static QMutex _readerMutex;
-	static QHash<png_structp, ApngReader*> _readers;
-
 	QIODevice *_device = nullptr;
 
 	png_structp _png = nullptr;

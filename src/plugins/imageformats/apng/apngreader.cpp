@@ -5,22 +5,14 @@
 #include <QThread>
 #include <QtEndian>
 
-QMutex ApngReader::_readerMutex;
-QHash<png_structp, ApngReader*> ApngReader::_readers;
-
 ApngReader::ApngReader(QObject *parent) :
 	QObject{parent}
 {}
 
 ApngReader::~ApngReader()
 {
-	if(_png) {
-		{
-			QMutexLocker lock(&_readerMutex);
-			_readers.remove(_png);
-		}
+	if(_png)
 		png_destroy_read_struct(&_png, &_info, nullptr);
-	}
 
 	if (_frame.rows)
 		delete[] _frame.rows;
@@ -62,11 +54,7 @@ bool ApngReader::init(QIODevice *device)
 		return false;
 	}
 
-	{
-		QMutexLocker lock(&_readerMutex);
-		_readers.insert(_png, this);
-	}
-	png_set_progressive_read_fn(_png, nullptr, &ApngReader::info_fn, &ApngReader::row_fn, &ApngReader::end_fn);
+	png_set_progressive_read_fn(_png, this, &ApngReader::info_fn, &ApngReader::row_fn, &ApngReader::end_fn);
 
 	//set png jump position
 	if (setjmp(png_jmpbuf(_png))) {
@@ -129,11 +117,7 @@ quint32 ApngReader::plays() const
 
 void ApngReader::info_fn(png_structp png_ptr, png_infop info_ptr)
 {
-	ApngReader *reader;
-	{
-		QMutexLocker lock(&_readerMutex);
-		reader = _readers[png_ptr];
-	}
+	auto reader = reinterpret_cast<ApngReader*>(png_get_io_ptr(png_ptr));
 	Frame &frame = reader->_frame;
 
 	//init png reading
@@ -187,22 +171,14 @@ void ApngReader::info_fn(png_structp png_ptr, png_infop info_ptr)
 void ApngReader::row_fn(png_structp png_ptr, png_bytep new_row, png_uint_32 row_num, int pass)
 {
 	Q_UNUSED(pass)
-	ApngReader *reader;
-	{
-		QMutexLocker lock(&_readerMutex);
-		reader = _readers[png_ptr];
-	}
+	auto reader = reinterpret_cast<ApngReader*>(png_get_io_ptr(png_ptr));
 	png_progressive_combine_row(png_ptr, reader->_frame.rows[row_num], new_row);
 }
 
 void ApngReader::end_fn(png_structp png_ptr, png_infop info_ptr)
 {
 	Q_UNUSED(info_ptr);
-	ApngReader *reader;
-	{
-		QMutexLocker lock(&_readerMutex);
-		reader = _readers[png_ptr];
-	}
+	auto reader = reinterpret_cast<ApngReader*>(png_get_io_ptr(png_ptr));
 	Frame &frame = reader->_frame;
 
 	if(!reader->_animated) {
@@ -223,11 +199,7 @@ void ApngReader::end_fn(png_structp png_ptr, png_infop info_ptr)
 void ApngReader::frame_info_fn(png_structp png_ptr, png_uint_32 frame_num)
 {
 	Q_UNUSED(frame_num);
-	ApngReader *reader;
-	{
-		QMutexLocker lock(&_readerMutex);
-		reader = _readers[png_ptr];
-	}
+	auto reader = reinterpret_cast<ApngReader*>(png_get_io_ptr(png_ptr));
 	auto info_ptr = reader->_info;
 	Frame &frame = reader->_frame;
 
@@ -243,11 +215,7 @@ void ApngReader::frame_info_fn(png_structp png_ptr, png_uint_32 frame_num)
 
 void ApngReader::frame_end_fn(png_structp png_ptr, png_uint_32 frame_num)
 {
-	ApngReader *reader;
-	{
-		QMutexLocker lock(&_readerMutex);
-		reader = _readers[png_ptr];
-	}
+	auto reader = reinterpret_cast<ApngReader*>(png_get_io_ptr(png_ptr));
 	Frame &frame = reader->_frame;
 	auto &image = reader->_lastImg;
 
