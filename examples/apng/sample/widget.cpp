@@ -15,7 +15,7 @@ Widget::Widget(QWidget *parent) :
 	auto m1 = new QMovie(QStringLiteral(":/data/sample.apng"), "apng", this);
 	m1->start();
 	ui->label_movie_apng->setMovie(m1);
-	auto m2 = new QMovie(QStringLiteral("/home/sky/Programming/QtLibraries/QtApng/tests/auto/apng/apngPlugin/sample-5.apng"), "apng", this);
+	auto m2 = new QMovie(QStringLiteral(":/data/sample.png"), "apng", this);
 	m2->start();
 	ui->label_movie_png->setMovie(m2);
 }
