@@ -1,7 +1,7 @@
 # CMakeLists.txt
 
-# Copyright (C) 2018 Cosmin Truta
-# Copyright (C) 2007,2009-2018 Glenn Randers-Pehrson
+# Copyright (c) 2018-2019 Cosmin Truta
+# Copyright (c) 2007,2009-2018 Glenn Randers-Pehrson
 # Written by Christian Ehrlicher, 2007
 # Revised by Roger Lowman, 2009-2010
 # Revised by Clifford Yapp, 2011-2012,2017
@@ -26,7 +26,7 @@ enable_testing()
 
 set(PNGLIB_MAJOR 1)
 set(PNGLIB_MINOR 6)
-set(PNGLIB_RELEASE 36)
+set(PNGLIB_RELEASE 38)
 set(PNGLIB_NAME libpng${PNGLIB_MAJOR}${PNGLIB_MINOR})
 set(PNGLIB_VERSION ${PNGLIB_MAJOR}.${PNGLIB_MINOR}.${PNGLIB_RELEASE})
 
@@ -40,7 +40,7 @@ option(PNG_BUILD_ZLIB "Custom zlib Location, else find_package is used" OFF)
 
 if(NOT PNG_BUILD_ZLIB)
   find_package(ZLIB REQUIRED)
-  include_directories(${ZLIB_INCLUDE_DIR})
+  include_directories(${ZLIB_INCLUDE_DIRS})
 endif()
 
 if(UNIX AND NOT APPLE AND NOT BEOS AND NOT HAIKU)
@@ -522,7 +522,7 @@ if(PNG_DEBUG)
 endif()
 
 # NOW BUILD OUR TARGET
-include_directories(${CMAKE_CURRENT_SOURCE_DIR} ${ZLIB_INCLUDE_DIR})
+include_directories(${CMAKE_CURRENT_SOURCE_DIR} ${ZLIB_INCLUDE_DIRS})
 
 unset(PNG_LIB_TARGETS)
 
@@ -536,7 +536,7 @@ if(PNG_SHARED)
     set_target_properties(png PROPERTIES PREFIX "lib")
     set_target_properties(png PROPERTIES IMPORT_PREFIX "lib")
   endif()
-  target_link_libraries(png ${ZLIB_LIBRARY} ${M_LIBRARY})
+  target_link_libraries(png ${ZLIB_LIBRARIES} ${M_LIBRARY})
 
   if(UNIX AND AWK)
     if(HAVE_LD_VERSION_SCRIPT)
@@ -571,7 +571,7 @@ if(PNG_STATIC)
     # msvc does not append 'lib' - do it here to have consistent name
     set_target_properties(png_static PROPERTIES PREFIX "lib")
   endif()
-  target_link_libraries(png_static ${ZLIB_LIBRARY} ${M_LIBRARY})
+  target_link_libraries(png_static ${ZLIB_LIBRARIES} ${M_LIBRARY})
 endif()
 
 if(PNG_FRAMEWORK)
@@ -588,7 +588,7 @@ if(PNG_FRAMEWORK)
     XCODE_ATTRIBUTE_INSTALL_PATH "@rpath"
     PUBLIC_HEADER "${libpng_public_hdrs}"
     OUTPUT_NAME png)
-  target_link_libraries(png_framework ${ZLIB_LIBRARY} ${M_LIBRARY})
+  target_link_libraries(png_framework ${ZLIB_LIBRARIES} ${M_LIBRARY})
 endif()
 
 if(NOT PNG_LIB_TARGETS)
@@ -753,7 +753,7 @@ if(PNG_SHARED)
   set(PNG_BIN_TARGETS pngfix)
 
   add_executable(png-fix-itxt ${png_fix_itxt_sources})
-  target_link_libraries(png-fix-itxt ${ZLIB_LIBRARY} ${M_LIBRARY})
+  target_link_libraries(png-fix-itxt ${ZLIB_LIBRARIES} ${M_LIBRARY})
   list(APPEND PNG_BIN_TARGETS png-fix-itxt)
 endif()
 
@@ -838,8 +838,8 @@ endif()
 # SET UP LINKS
 if(PNG_SHARED)
   set_target_properties(png PROPERTIES
-#   VERSION 16.${PNGLIB_RELEASE}.1.6.36
-    VERSION 16.${PNGLIB_RELEASE}.0
+    VERSION 16.${PNGLIB_RELEASE}.git
+#   VERSION 16.${PNGLIB_RELEASE}.0
     SOVERSION 16
     CLEAN_DIRECT_OUTPUT 1)
 endif()
