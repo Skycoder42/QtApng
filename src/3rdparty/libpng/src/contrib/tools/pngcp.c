@@ -506,7 +506,7 @@ static void
 display_clean_read(struct display *dp)
 {
    if (dp->read_pp != NULL)
-      png_destroy_read_struct(&dp->read_pp, (dp->ip!=NULL ? &dp->ip : NULL), NULL);
+      png_destroy_read_struct(&dp->read_pp, NULL, NULL);
 
    if (dp->fp != NULL)
    {
@@ -2286,6 +2286,20 @@ cppng(struct display *dp, const char *file, const char *gv dest)
    {
       dp->errset = 1;
       cp_one_file(dp, file, dest);
+      dp->errset = 0;
+      return 0;
+   }
+
+   else
+   {
+      dp->errset = 0;
+
+      if (ret < ERRORS) /* shouldn't longjmp on warnings */
+         display_log(dp, INTERNAL_ERROR, "unexpected return code %d", ret);
+
+      return ret;
+   }
+}
 
 int
 main(int argc, char **argv)
@@ -2325,6 +2339,7 @@ main(int argc, char **argv)
       {
          const char *infile = NULL;
          const char *outfile = NULL;
+         int ret;
 
          if (i < argc)
          {
@@ -2333,20 +2348,17 @@ main(int argc, char **argv)
                outfile = argv[argc-1];
          }
 
-         struct display *dp = &d;
-         if (setjmp(dp->error_return) == 0)
+         ret = cppng(&d, infile, outfile);
+
+         if (ret)
          {
-            dp->errset = 1;
-            cp_one_file(dp, infile, outfile);
-            dp->errset = 0;
+            if (ret > QUIET) /* abort on user or internal error */
+               return 99;
+
+            /* An error: the output is meaningless */
          }
 
-         else
-         {
-            dp->errset = 0;
-         }
-
-         if (d.best[0] != 0)
+         else if (d.best[0] != 0)
          {
             /* This result may already have been output, in which case best_size
              * has been reset.

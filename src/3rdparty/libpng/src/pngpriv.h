@@ -1,7 +1,7 @@
 
 /* pngpriv.h - private declarations for use inside libpng
  *
- * Copyright (c) 2018-2019 Cosmin Truta
+ * Copyright (c) 2018 Cosmin Truta
  * Copyright (c) 1998-2002,2004,2006-2018 Glenn Randers-Pehrson
  * Copyright (c) 1996-1997 Andreas Dilger
  * Copyright (c) 1995-1996 Guy Eric Schalnat, Group 42, Inc.
@@ -22,7 +22,6 @@
 
 #ifndef PNGPRIV_H
 #define PNGPRIV_H
-
 
 /* Feature Test Macros.  The following are defined here to ensure that correctly
  * implemented libraries reveal the APIs libpng needs to build and hide those
@@ -186,8 +185,6 @@
       /* Use the intrinsics code by default. */
 #     define PNG_ARM_NEON_IMPLEMENTATION 1
 #  endif
-#else /* PNG_ARM_NEON_OPT == 0 */
-#     define PNG_ARM_NEON_IMPLEMENTATION 0
 #endif /* PNG_ARM_NEON_OPT > 0 */
 
 #ifndef PNG_MIPS_MSA_OPT
@@ -195,15 +192,6 @@
 #     define PNG_MIPS_MSA_OPT 2
 #  else
 #     define PNG_MIPS_MSA_OPT 0
-#  endif
-#endif
-
-
-#ifndef PNG_LOONGSON_MMI_OPT
-#  if defined(__loongson_mmi) && defined(_MIPS_ARCH_LOONGSON3A) && defined(PNG_ALIGNED_MEMORY_SUPPORTED)
-#     define PNG_LOONGSON_MMI_OPT 2
-#  else
-#     define PNG_LOONGSON_MMI_OPT 0
 #  endif
 #endif
 
@@ -276,26 +264,6 @@
 #     define PNG_MIPS_MSA_IMPLEMENTATION 1
 #  endif
 #endif /* PNG_MIPS_MSA_OPT > 0 */
-
-#if PNG_LOONGSON_MMI_OPT > 0
-#  define PNG_FILTER_OPTIMIZATIONS png_init_filter_functions_mmi
-#  ifndef PNG_LOONGSON_MMI_IMPLEMENTATION
-#     if defined(__loongson_mmi)
-#        if defined(__clang__)
-#        elif defined(__GNUC__)
-#           if __GNUC__ < 4 || (__GNUC__ == 4 && __GNUC_MINOR__ < 7)
-#              define PNG_LOONGSON_MMI_IMPLEMENTATION 2
-#           endif /* no GNUC support */
-#        endif /* __GNUC__ */
-#     else /* !defined __loongson_mmi */
-#        define PNG_LOONGSON_MMI_IMPLEMENTATION 2
-#     endif /* __loongson_mmi */
-#  endif /* !PNG_LOONGSON_MMI_IMPLEMENTATION */
-
-#  ifndef PNG_LOONGSON_MMI_IMPLEMENTATION
-#     define PNG_LOONGSON_MMI_IMPLEMENTATION 1
-#  endif
-#endif /* PNG_LOONGSON_MMI_OPT > 0 */
 
 #if PNG_POWERPC_VSX_OPT > 0
 #  define PNG_FILTER_OPTIMIZATIONS png_init_filter_functions_vsx
@@ -1378,27 +1346,6 @@ PNG_INTERNAL_FUNCTION(void,png_read_filter_row_paeth4_msa,(png_row_infop
     row_info, png_bytep row, png_const_bytep prev_row),PNG_EMPTY);
 #endif
 
-#if PNG_LOONGSON_MMI_OPT > 0
-PNG_INTERNAL_FUNCTION(void,png_read_filter_row_up_mmi,(png_row_infop row_info,
-    png_bytep row, png_const_bytep prev_row),PNG_EMPTY);
-PNG_INTERNAL_FUNCTION(void,png_read_filter_row_sub3_mmi,(png_row_infop
-    row_info, png_bytep row, png_const_bytep prev_row),PNG_EMPTY);
-PNG_INTERNAL_FUNCTION(void,png_read_filter_row_sub4_mmi,(png_row_infop
-    row_info, png_bytep row, png_const_bytep prev_row),PNG_EMPTY);
-PNG_INTERNAL_FUNCTION(void,png_read_filter_row_sub6_mmi,(png_row_infop
-    row_info, png_bytep row, png_const_bytep prev_row),PNG_EMPTY);
-PNG_INTERNAL_FUNCTION(void,png_read_filter_row_sub8_mmi,(png_row_infop
-    row_info, png_bytep row, png_const_bytep prev_row),PNG_EMPTY);
-PNG_INTERNAL_FUNCTION(void,png_read_filter_row_avg3_mmi,(png_row_infop
-    row_info, png_bytep row, png_const_bytep prev_row),PNG_EMPTY);
-PNG_INTERNAL_FUNCTION(void,png_read_filter_row_avg4_mmi,(png_row_infop
-    row_info, png_bytep row, png_const_bytep prev_row),PNG_EMPTY);
-PNG_INTERNAL_FUNCTION(void,png_read_filter_row_paeth3_mmi,(png_row_infop
-    row_info, png_bytep row, png_const_bytep prev_row),PNG_EMPTY);
-PNG_INTERNAL_FUNCTION(void,png_read_filter_row_paeth4_mmi,(png_row_infop
-    row_info, png_bytep row, png_const_bytep prev_row),PNG_EMPTY);
-#endif
-
 #if PNG_POWERPC_VSX_OPT > 0
 PNG_INTERNAL_FUNCTION(void,png_read_filter_row_up_vsx,(png_row_infop row_info,
     png_bytep row, png_const_bytep prev_row),PNG_EMPTY);
@@ -2216,11 +2163,6 @@ PNG_INTERNAL_FUNCTION(void, png_init_filter_functions_msa,
    (png_structp png_ptr, unsigned int bpp), PNG_EMPTY);
 #endif
 
-#if PNG_LOONGSON_MMI_OPT > 0
-PNG_INTERNAL_FUNCTION(void, png_init_filter_functions_mmi,
-   (png_structp png_ptr, unsigned int bpp), PNG_EMPTY);
-#endif
-
 #  if PNG_INTEL_SSE_IMPLEMENTATION > 0
 PNG_INTERNAL_FUNCTION(void, png_init_filter_functions_sse2,
    (png_structp png_ptr, unsigned int bpp), PNG_EMPTY);
@@ -2232,11 +2174,11 @@ PNG_INTERNAL_FUNCTION(png_uint_32, png_check_keyword, (png_structrp png_ptr,
 
 #if PNG_ARM_NEON_IMPLEMENTATION == 1
 PNG_INTERNAL_FUNCTION(void,
-                      png_riffle_palette_neon,
-                      (png_structrp),
+                      png_riffle_palette_rgba,
+                      (png_structrp, png_row_infop),
                       PNG_EMPTY);
 PNG_INTERNAL_FUNCTION(int,
-                      png_do_expand_palette_rgba8_neon,
+                      png_do_expand_palette_neon_rgba,
                       (png_structrp,
                        png_row_infop,
                        png_const_bytep,
@@ -2244,7 +2186,7 @@ PNG_INTERNAL_FUNCTION(int,
                        const png_bytepp),
                       PNG_EMPTY);
 PNG_INTERNAL_FUNCTION(int,
-                      png_do_expand_palette_rgb8_neon,
+                      png_do_expand_palette_neon_rgb,
                       (png_structrp,
                        png_row_infop,
                        png_const_bytep,

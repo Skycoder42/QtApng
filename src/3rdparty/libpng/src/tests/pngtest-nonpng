@@ -1,3 +1,0 @@
-#!/bin/sh
-
-./pngtest --xfail ${srcdir}/contrib/testpngs/crashers/non-png 

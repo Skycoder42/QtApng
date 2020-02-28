@@ -1,7 +1,7 @@
 
 /* pngwrite.c - general routines to write a PNG file
  *
- * Copyright (c) 2018-2019 Cosmin Truta
+ * Copyright (c) 2018 Cosmin Truta
  * Copyright (c) 1998-2002,2004,2006-2018 Glenn Randers-Pehrson
  * Copyright (c) 1996-1997 Andreas Dilger
  * Copyright (c) 1995-1996 Guy Eric Schalnat, Group 42, Inc.
@@ -75,7 +75,7 @@ write_unknown_chunks(png_structrp png_ptr, png_const_inforp info_ptr,
  * library.  If you have a new chunk to add, make a function to write it,
  * and put it in the correct location here.  If you want the chunk written
  * after the image data, put it in png_write_end().  I strongly encourage
- * you to supply a PNG_INFO_<chunk> flag, and check info_ptr->valid before writing
+ * you to supply a PNG_INFO_ flag, and check info_ptr->valid before writing
  * the chunk, as that will keep the code from breaking if you want to just
  * write a plain PNG file.  If you have long comments, I suggest writing
  * them in png_write_end(), and compressing them.
@@ -957,6 +957,10 @@ png_write_destroy(png_structrp png_ptr)
    png_free_buffer_list(png_ptr, &png_ptr->zbuffer_list);
    png_free(png_ptr, png_ptr->row_buf);
    png_ptr->row_buf = NULL;
+#ifdef PNG_READ_EXPANDED_SUPPORTED
+   png_free(png_ptr, png_ptr->riffled_palette);
+   png_ptr->riffled_palette = NULL;
+#endif
 #ifdef PNG_WRITE_FILTER_SUPPORTED
    png_free(png_ptr, png_ptr->prev_row);
    png_free(png_ptr, png_ptr->try_row);
@@ -1193,17 +1197,6 @@ png_set_compression_strategy(png_structrp png_ptr, int strategy)
    if (png_ptr == NULL)
       return;
 
-   if(strategy > 4)
-   {
-      png_warning(png_ptr, "Only compression strategy<=4 is supported by zlib");
-      strategy = 4;
-   }
-   else if(strategy < 0)
-   {
-      png_warning(png_ptr, "Only compression strategy>=0 is supported by zlib");
-      strategy = 0;
-   }
-
    /* The flag setting here prevents the libpng dynamic selection of strategy.
     */
    png_ptr->flags |= PNG_FLAG_ZLIB_CUSTOM_STRATEGY;
@@ -1220,7 +1213,7 @@ png_set_compression_window_bits(png_structrp png_ptr, int window_bits)
       return;
 
    /* Prior to 1.6.0 this would warn but then set the window_bits value. This
-    * * meant that negative window_bits values could be selected that would cause
+    * meant that negative window bits values could be selected that would cause
     * libpng to write a non-standard PNG file with raw deflate or gzip
     * compressed IDAT or ancillary chunks.  Such files can be read and there is
     * no warning on read, so this seems like a very bad idea.
@@ -1267,17 +1260,6 @@ png_set_text_compression_level(png_structrp png_ptr, int level)
 
    if (png_ptr == NULL)
       return;
-
-   if(level > 9)
-   {
-      png_warning(png_ptr, "Only compression level <= 9 supported by PNG");
-      level = 9;
-   }
-   else if(level < -1)
-   {
-      png_warning(png_ptr, "Only compression level >= -1 supported by PNG");
-      level = -1;
-   }
 
    png_ptr->zlib_text_level = level;
 }
