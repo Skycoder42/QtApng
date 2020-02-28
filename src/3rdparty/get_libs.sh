@@ -25,7 +25,7 @@ mv libpng-${LIBPNG_VERSION} libpng/src
 curl -Lo libpng-apng.patch.gz "https://downloads.sourceforge.net/sourceforge/libpng-apng/libpng-${LIBPNG_VERSION}-apng.patch.gz"
 gunzip libpng-apng.patch.gz
 pushd libpng/src
-patch -Np1 -i "../libpng-apng.patch"
+patch -Np1 -i "../../libpng-apng.patch"
 cp scripts/pnglibconf.h.prebuilt pnglibconf.h
 popd
 rm libpng-apng.patch
