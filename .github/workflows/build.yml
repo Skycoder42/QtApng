@@ -143,3 +143,4 @@ jobs:
           host: ${{secrets.SSHFS_HOST}}
           key: ${{secrets.SSHFS_KEY}}
           port: ${{secrets.SSHFS_PORT}}
+          excludes: doc
