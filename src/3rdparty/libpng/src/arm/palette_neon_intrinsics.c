@@ -1,7 +1,7 @@
 
 /* palette_neon_intrinsics.c - NEON optimised palette expansion functions
  *
- * Copyright (c) 2018 Cosmin Truta
+ * Copyright (c) 2018-2019 Cosmin Truta
  * Copyright (c) 2017-2018 Arm Holdings. All rights reserved.
  * Written by Richard Townsend <Richard.Townsend@arm.com>, February 2017.
  *
@@ -14,15 +14,15 @@
 
 #if PNG_ARM_NEON_IMPLEMENTATION == 1
 
-#if defined(_MSC_VER) && defined(_M_ARM64)
+#if defined(_MSC_VER) && !defined(__clang__) && defined(_M_ARM64)
 #  include <arm64_neon.h>
 #else
 #  include <arm_neon.h>
 #endif
 
-/* Build an RGBA palette from the RGB and separate alpha palettes. */
+/* Build an RGBA8 palette from the separate RGB and alpha palettes. */
 void
-png_riffle_palette_rgba(png_structrp png_ptr, png_row_infop row_info)
+png_riffle_palette_neon(png_structrp png_ptr)
 {
    png_const_colorp palette = png_ptr->palette;
    png_bytep riffled_palette = png_ptr->riffled_palette;
@@ -38,16 +38,12 @@ png_riffle_palette_rgba(png_structrp png_ptr, png_row_infop row_info)
       vdupq_n_u8(0xff),
    }};
 
-   if (row_info->bit_depth != 8)
-   {
-      png_error(png_ptr, "bit_depth must be 8 for png_riffle_palette_rgba");
-      return;
-   }
+   png_debug(1, "in png_riffle_palette_neon");
 
-   /* First, riffle the RGB colours into a RGBA palette, the A value is
-    * set to opaque for now.
+   /* First, riffle the RGB colours into an RGBA8 palette.
+    * The alpha component is set to opaque for now.
     */
-   for (i = 0; i < (1 << row_info->bit_depth); i += 16)
+   for (i = 0; i < 256; i += 16)
    {
       uint8x16x3_t v = vld3q_u8((png_const_bytep)(palette + i));
       w.val[0] = v.val[0];
@@ -61,9 +57,9 @@ png_riffle_palette_rgba(png_structrp png_ptr, png_row_infop row_info)
       riffled_palette[(i << 2) + 3] = trans_alpha[i];
 }
 
-/* Expands a palettized row into RGBA. */
+/* Expands a palettized row into RGBA8. */
 int
-png_do_expand_palette_neon_rgba(png_structrp png_ptr, png_row_infop row_info,
+png_do_expand_palette_rgba8_neon(png_structrp png_ptr, png_row_infop row_info,
     png_const_bytep row, png_bytepp ssp, png_bytepp ddp)
 {
    png_uint_32 row_width = row_info->width;
@@ -71,6 +67,8 @@ png_do_expand_palette_neon_rgba(png_structrp png_ptr, png_row_infop row_info,
       (const png_uint_32 *)png_ptr->riffled_palette;
    const png_int_32 pixels_per_chunk = 4;
    int i;
+
+   png_debug(1, "in png_do_expand_palette_rgba8_neon");
 
    if (row_width < pixels_per_chunk)
       return 0;
@@ -103,15 +101,17 @@ png_do_expand_palette_neon_rgba(png_structrp png_ptr, png_row_infop row_info,
    return i;
 }
 
-/* Expands a palettized row into RGB format. */
+/* Expands a palettized row into RGB8. */
 int
-png_do_expand_palette_neon_rgb(png_structrp png_ptr, png_row_infop row_info,
+png_do_expand_palette_rgb8_neon(png_structrp png_ptr, png_row_infop row_info,
     png_const_bytep row, png_bytepp ssp, png_bytepp ddp)
 {
    png_uint_32 row_width = row_info->width;
    png_const_bytep palette = (png_const_bytep)png_ptr->palette;
    const png_uint_32 pixels_per_chunk = 8;
    int i;
+
+   png_debug(1, "in png_do_expand_palette_rgb8_neon");
 
    if (row_width <= pixels_per_chunk)
       return 0;
