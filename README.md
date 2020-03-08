@@ -1,8 +1,7 @@
 # QtApng
 apng image plugin for Qt to support animated PNGs
 
-[![Travis Build Status](https://travis-ci.org/Skycoder42/QtApng.svg?branch=master)](https://travis-ci.org/Skycoder42/QtApng)
-[![Appveyor Build status](https://ci.appveyor.com/api/projects/status/gdfl5n2kblw6x0fu?svg=true)](https://ci.appveyor.com/project/Skycoder42/qtapng)
+[![CI build](https://github.com/Skycoder42/QtApng/workflows/CI%20build/badge.svg)](https://github.com/Skycoder42/QtApng/actions?query=workflow%3A%22CI+build%22)
 [![Codacy Badge](https://api.codacy.com/project/badge/Grade/c2a4d6813a07497784580e79475a314e)](https://www.codacy.com/app/Skycoder42/QtApng)
 [![AUR](https://img.shields.io/aur/version/qt5-apng-plugin.svg)](https://aur.archlinux.org/pkgbase/qt5-apng-plugin/)
 

@@ -8,8 +8,6 @@ CONFIG -= app_bundle
 TARGET = tst_apngplugin
 
 DEFINES += SRCDIR=\\\"$$PWD/\\\"
-DEFINES += OUTDIR=\\\"$$OUT_PWD/\\\"
-DEFINES += PLGDIR=\\\"$$[QT_INSTALL_PLUGINS]/\\\"
 
 SOURCES += \
 	tst_apngplugin.cpp
