@@ -50,7 +50,7 @@ private:
 	png_infop _info = nullptr;
 
 	//image info
-	bool _infoRead = false;
+	qint64 _infoOffset = 0;
 	bool _animated = false;
 	bool _skipFirst = false;
 	QSize _imageSize;
