@@ -15,7 +15,7 @@ public:
 	~ApngImageHandler() override;
 
 	// QImageIOHandler interface
-	QByteArray name() const final;
+	QByteArray name() const;
 	bool canRead() const final;
 	bool read(QImage *image) final;
 	QVariant option(ImageOption option) const final;
