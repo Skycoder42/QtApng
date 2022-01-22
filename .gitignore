@@ -73,3 +73,9 @@ Thumbs.db
 
 # qpm
 vendor
+
+# Visual Studio Code settings
+.vscode/
+
+# Generic build folder
+build/

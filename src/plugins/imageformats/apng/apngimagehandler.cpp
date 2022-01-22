@@ -17,7 +17,7 @@ bool ApngImageHandler::canRead() const
 {
 	auto valid = _reader->init(device());
 	if(valid)
-		setFormat("apng");
+		setFormat(_reader->isAnimated() ? "apng" : "png");
 	return valid && _index < _reader->frames();
 }
 
